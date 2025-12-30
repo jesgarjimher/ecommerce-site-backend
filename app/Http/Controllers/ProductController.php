@@ -22,6 +22,7 @@ class ProductController extends Controller
         return Product::all();
     }
 
+
     function delete($id) {
         $result = Product::where("id",$id)->delete();
         if($result) {
@@ -30,4 +31,11 @@ class ProductController extends Controller
             return ["result" => "Operation failed"];
         }
     }
+
+    function getProduct($id) {
+        return Product::find($id);
+    }
+
+
+
 }
