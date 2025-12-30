@@ -36,6 +36,27 @@ class ProductController extends Controller
         return Product::find($id);
     }
 
+    function editProduct(Request $req, $id) {
+        $product = Product::find($id);
+
+        if(!$product) {
+            return response()->json(["result" => "Product not found"], 404);
+        }
+
+        $product->name = $req->input("name");
+        $product->price = $req->input("price");
+        $product->description = $req->input("description");
+
+        if($req->hasFile("file")) {
+            $product->file_path = $req->file("file")->store("products","public");
+
+        }
+
+        $product->save();
+
+        return $product;
+    }
+
 
 
 }
