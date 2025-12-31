@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Storage;
 
 class ProductController extends Controller
 {
@@ -48,6 +49,10 @@ class ProductController extends Controller
         $product->description = $req->input("description");
 
         if($req->hasFile("file")) {
+            if($product->file_path) { //if a photo already exists
+                Storage::disk("public")->delete($product->file_path);
+            }
+            
             $product->file_path = $req->file("file")->store("products","public");
 
         }
