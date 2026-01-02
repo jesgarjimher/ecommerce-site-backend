@@ -20,7 +20,8 @@ class ProductController extends Controller
     }
 
     function list() {
-        return Product::all();
+        //return Product::all(); for all
+        return Product::paginate(5);
     }
 
 
