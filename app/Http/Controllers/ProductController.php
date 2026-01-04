@@ -5,18 +5,36 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
     //
     function addProduct(Request $req) {
+
+        $rules = [
+            "name" => "required|min:3",
+            "price" => "required|numeric",
+            "file" => "required|image|mimes:jpeg,png,jpg|max:2048",
+            "description" => "required"
+        ];
+
+        $validator = Validator::make($req->all(), $rules);
+        
+        if($validator->fails()) {
+            return response()->json([
+                "status" => "error",
+                "errors" => $validator->errors()
+            ],422);
+        }
+
         $product = new Product;
         $product->file_path = $req->file("file")->store("products","public");
         $product->name = $req->input("name");
         $product->price = $req->input("price");
         $product->description = $req->input("description");
         $product->save();
-        return $product;
+        return response()->json(["status" => "success","data" => $product],201);
     }
 
     function list() {
