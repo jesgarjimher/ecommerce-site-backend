@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Storage;
@@ -39,7 +40,13 @@ class ProductController extends Controller
 
     function list() {
         //return Product::all(); for all
-        return Product::paginate(5);
+        try{
+            $products = Product::paginate(5);
+            return response()->json($products,200);
+        }catch(Exception $error){
+            return response()->json(["error" => "Internal server error","message" => "There was a problem connecting to the database"],500);
+        }
+        
     }
 
 
