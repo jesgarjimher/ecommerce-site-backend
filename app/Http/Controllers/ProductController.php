@@ -51,17 +51,18 @@ class ProductController extends Controller
 
 
     function delete($id) {
-        $product = Product::find($id);
-        if(!$product) {
-            return response()->json(["result" => "Error", "message" => "The product doesn't exist or has been deleted already"],404);
-        }
-
         try {
+            $product = Product::find($id);
+            if(!$product) {
+                return response()->json(["result" => "Error", "message" => "The product doesn't exist or has been deleted already"],404);
+            }
+
+        
             if($product->file_path) {
                 Storage::disk("public")->delete($product->file_path);
             }
             $product->delete();
-            return response()->json(["result" => "Success", "mesage" => "Product deleted"],200);
+            return response()->json(["result" => "Success", "message" => "Product deleted"],200);
         }catch(Exception $error) {
             return response()->json(["result" => "Error", "message" => "Couldn't delete product"],500);
         }
