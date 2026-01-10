@@ -109,10 +109,6 @@ class ProductController extends Controller
     function search($key) {
         try {
             $products = Product::where("name","Like","%$key%")->get();
-
-            if($products->isEmpty()) {
-                return response()->json(["result" => "empty", "message" => "No matches found for $key"]);
-            }
             return response()->json($products,200);
         }catch(Exception $error) {
             return response()->json(["result" => "error", "message" => "Database failed, please try again"], 500);
