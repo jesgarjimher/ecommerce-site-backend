@@ -73,11 +73,15 @@ class ProductController extends Controller
 
 
     function getProduct($id) {
-        $product = Product::find($id);
-        if(!$product) {
-            return response()->json(["message" => "Product not found"],404);
+        try {
+            $product = Product::find($id);
+            if(!$product) {
+                return response()->json(["message" => "Product not found"],404);
+            }
+            return response()->json(["status" => "success","data" =>$product],200);
+        }catch(Exception $error) {
+            return response()->json(["message" => "Server error"],500);
         }
-        return $product;
     }
 
     function editProduct(Request $req, $id) {
