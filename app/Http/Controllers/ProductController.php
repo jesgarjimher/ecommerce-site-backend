@@ -81,28 +81,51 @@ class ProductController extends Controller
     }
 
     function editProduct(Request $req, $id) {
-        $product = Product::find($id);
+        try {
 
-        if(!$product) {
-            return response()->json(["result" => "Product not found"], 404);
-        }
+        
+            $product = Product::find($id);
 
-        $product->name = $req->input("name");
-        $product->price = $req->input("price");
-        $product->description = $req->input("description");
-
-        if($req->hasFile("file")) {
-            if($product->file_path) { //if a photo already exists
-                Storage::disk("public")->delete($product->file_path);
+            if(!$product) {
+                return response()->json(["result" => "Error", "message" => "Product doesn't exist"], 404);
             }
-            
-            $product->file_path = $req->file("file")->store("products","public");
 
+            $rules = [
+                "name" => "min:3",
+                "price" => "numeric",
+                "file" => "nullable|image|mimes:jpeg,png,jpg|max:2048"
+            ];
+
+            $validator = Validator::make($req->all(), $rules);
+            if($validator->fails()) {
+                return response()->json(["status" =>"error", "errors" => $validator->errors()],422);
+            }
+
+            $product->name = $req->input("name");
+            $product->price = $req->input("price");
+            $product->description = $req->input("description");
+
+            if($req->hasFile("file")) {
+                if($product->file_path) { //if a photo already exists
+                    Storage::disk("public")->delete($product->file_path);
+                }
+                
+                $product->file_path = $req->file("file")->store("products","public");
+            }
+
+            $product->save();
+
+            return response()->json([
+                "status" => "success",
+                "message" => "Product updated",
+                "data" => $product
+            ],200);
+        }catch(Exception $error) {
+            return response()->json([
+                "result" => "error",
+                "message" => "Couldn't update product, database problem"
+            ],500);
         }
-
-        $product->save();
-
-        return $product;
     }
 
 
